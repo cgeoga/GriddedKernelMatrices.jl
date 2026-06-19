@@ -1,0 +1,10 @@
+*.csv
+*.jld
+*.h5
+*.hdf5
+*.pdf
+*.txt
+*.swp
+*.log
+*.jls
+devel
