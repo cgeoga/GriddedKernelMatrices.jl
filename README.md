@@ -36,7 +36,7 @@ v = Float64.(eachindex(pts))
 @show isapprox(M_ref*v, M_fast*v)
 
 # example solve:
-isapprox(M_ref\v, M_fast\v) # < 10 iterations, so < 20 FFTs.
+isapprox(M_ref\v, M_fast\v, rtol=1e-8) # < 10 iterations, so < 20 FFTs.
 ```
 There is analogous functionality for one-dimensional lattice data.
 
