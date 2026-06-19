@@ -38,6 +38,33 @@ end
 
 Base.:\(M::MaskedSymToeplitz, x) = ldiv!(copy(x), M, x)
 
+struct CrossMaskedSymToeplitz{F}
+  toep::SymToeplitz{F}
+  ixs_out::Vector{Int}
+  ixs_in::Vector{Int}
+  buf1::Vector{Float64}
+  buf2::Vector{Float64}
+end
+
+Base.eltype(M::CrossMaskedSymToeplitz) = Float64
+Base.size(M::CrossMaskedSymToeplitz) = (length(M.ixs_out), length(M.ixs_in))
+Base.size(M::CrossMaskedSymToeplitz, d::Int) = d == 1 ? length(M.ixs_out) : length(M.ixs_in)
+
+function LinearAlgebra.mul!(y::Vector{Float64}, M::CrossMaskedSymToeplitz, x::Vector{Float64})
+  fill!(M.buf1, 0.0)
+  @inbounds for (i, idx) in enumerate(M.ixs_in)
+    M.buf1[idx] = x[i]
+  end
+  mul!(M.buf2, M.toep, M.buf1)
+  @inbounds for (i, idx) in enumerate(M.ixs_out)
+    y[i] = M.buf2[idx]
+  end
+  y
+end
+
+Base.:*(M::CrossMaskedSymToeplitz, x::Vector{Float64}) = mul!(zeros(Float64, size(M, 1)), M, x)
+
+
 struct MaskedSymBTTB{B,P}
   bttb::B
   given_ixs::Vector{Int64}
@@ -88,4 +115,32 @@ function LinearAlgebra.ldiv!(buf::Vector{Float64}, M::MaskedSymBTTB,
 end
 
 Base.:\(M::MaskedSymBTTB, x) = ldiv!(copy(x), M, x)
+
+struct CrossMaskedBTTB{B,P}
+  bttb::SymBTTB{B,P}
+  ixs_out::Vector{Int}
+  ixs_in::Vector{Int}
+  buf1::Vector{Float64}
+  buf2::Vector{Float64}
+end
+
+Base.eltype(M::CrossMaskedBTTB)  = Float64
+Base.size(M::CrossMaskedBTTB)    = (length(M.ixs_out), length(M.ixs_in))
+Base.size(M::CrossMaskedBTTB, j) = j == 1 ? length(M.ixs_out) : length(M.ixs_in)
+LinearAlgebra.issymmetric(M::CrossMaskedBTTB) = false
+LinearAlgebra.ishermitian(M::CrossMaskedBTTB) = false
+
+function LinearAlgebra.mul!(y::Vector{Float64}, M::CrossMaskedBTTB, x::Vector{Float64})
+  fill!(M.buf1, 0.0)
+  @inbounds for (i, idx) in enumerate(M.ixs_in)
+    M.buf1[idx] = x[i]
+  end
+  mul!(M.buf2, M.bttb, M.buf1)
+  @inbounds for (i, idx) in enumerate(M.ixs_out)
+    y[i] = M.buf2[idx]
+  end
+  y
+end
+
+Base.:*(M::CrossMaskedBTTB, x::Vector{Float64}) = mul!(zeros(Float64, size(M, 1)), M, x)
 

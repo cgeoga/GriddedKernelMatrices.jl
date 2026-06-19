@@ -90,3 +90,4 @@ function LinearAlgebra.ldiv!(buf::Vector{Float64}, M::SymBTTB,
 end
 
 Base.:\(M::SymBTTB, x) = ldiv!(copy(x), M, x)
+

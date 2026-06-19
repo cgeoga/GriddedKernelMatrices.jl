@@ -7,6 +7,7 @@ using LatticeMatrices.LinearAlgebra
   include("block_toeplitz.jl")
   include("masked_mul.jl")
   include("kernel_gaps.jl")
+  include("cross_mul.jl")
 end
 
 @testset "solve" begin

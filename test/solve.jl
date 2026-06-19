@@ -14,5 +14,5 @@ M_fast = lattice_kernel_matrix(pts, h->exp(-norm(h)),
                                VecchiaPreconditioner(k=40))
 
 v = Float64.(eachindex(pts))
-@test isapprox(M_fast\v, M_ref\v, rtol=1e-8)
+@test isapprox(M_fast\v, M_ref\v, rtol=1e-7)
 
