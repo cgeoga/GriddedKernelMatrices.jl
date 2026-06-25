@@ -39,3 +39,7 @@ isapprox(M_ref\v, M_fast\v, rtol=1e-8) # < 10 iterations, so < 20 FFTs.
 There is analogous functionality for one-dimensional lattice data. See the tests
 for more demonstrations.
 
+Note that this package does **not** offer fast factorizations, so if you want a
+log-determinant or anything more involved than a matvec and a solve, your best
+bet is to use [HMatrices.jl](https://github.com/IntegralEquations/HMatrices.jl).
+
