@@ -5,24 +5,17 @@ module LatticeMatricesKrylovExt
   using LatticeMatrices.LinearAlgebra
   import LatticeMatrices: SymToeplitz, SymBTTB, MaskedSymToeplitz, MaskedSymBTTB
 
-  function LatticeMatrices._solve!(buf, M::SymToeplitz, v)
-    buf .= cg(M, v; M=M.pre)[1]
-    buf
-  end
+  for T in (SymToeplitz, SymBTTB, MaskedSymToeplitz, MaskedSymBTTB)
+    @eval begin
 
-  function LatticeMatrices._solve!(buf, M::SymBTTB, v)
-    buf .= cg(M, v; M=M.pre)[1]
-    buf
-  end
+    function LatticeMatrices._solve!(buf, M::$T, v)
+      work = CgWorkspace(M, v)
+      cg!(work, M, v; M=M.pre)
+      buf .= work.x
+      buf
+    end
 
-  function LatticeMatrices._solve!(buf, M::MaskedSymToeplitz, v)
-    buf .= cg(M, v; M=M.pre)[1]
-    buf
-  end
-
-  function LatticeMatrices._solve!(buf, M::MaskedSymBTTB, v)
-    buf .= cg(M, v; M=M.pre)[1]
-    buf
+    end
   end
 
 end
