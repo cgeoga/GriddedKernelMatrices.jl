@@ -22,12 +22,9 @@ grid1d = range(0.0, 1.0, length=64)
 pts    = vec(SVector{2,Float64}.(Iterators.product(grid1d, grid1d)))
 pts    = pts[setdiff(1:length(pts), sort(unique(rand(1:length(pts), 50))))]
 
-# Create the exponential covariance matrix for them.
-M_ref  = [exp(-norm(x-y)) for x in pts, y in pts]
-
-# Create the fast implicit operator for them that is equivalent to M_ref. 
-# If you want to solve a linear system, specify a Vecchia-based 
-# preconditioner like so.
+# This object is the equivalent of [exp(-norm(x-y)) for x in pts, y in pts].
+# If your kernel is smooth away from the origin and you want efficient linear
+# solves, specify a Vecchia preconditioner like so.
 M_fast = lattice_kernel_matrix(pts, h->exp(-norm(h)), 
                                VecchiaPreconditioner(k=40))
 
@@ -38,9 +35,6 @@ v = Float64.(eachindex(pts))
 # example solve:
 isapprox(M_ref\v, M_fast\v, rtol=1e-8) # < 10 iterations, so < 20 FFTs.
 ```
-There is analogous functionality for one-dimensional lattice data.
-
-**Note:** this code is early in development and was put together mostly for one
-specific application that I have in mind. While it is plenty useful already,
-please open issues if there is functionality you would like that is missing.
+There is analogous functionality for one-dimensional lattice data. See the tests
+for more demonstrations.
 
