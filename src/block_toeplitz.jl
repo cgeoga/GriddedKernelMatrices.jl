@@ -18,7 +18,7 @@ function BCCB(c::Vector{Float64}, sizes::Tuple{Int, Int})
   BCCB(real(fft(reshape(c, sizes))), sizes, buf, plan)
 end
 
-function LinearAlgebra.mul!(buf::Vector{Float64}, M::BCCB, v::Vector{Float64})
+function LinearAlgebra.mul!(buf::AbstractVector{Float64}, M::BCCB, v::AbstractVector{Float64})
   M.buf  .= reshape(v, M.sizes)
   M.plan*M.buf
   M.buf .*= M.Λ
@@ -38,7 +38,7 @@ struct SymBTTB{B,P}
 end
 
 Base.eltype(M::SymBTTB)  = Float64
-Base.size(M::SymBTTB)    = (prod(size(M.orig_sizes)), prod(size(M.orig_sizes)))
+Base.size(M::SymBTTB)    = (prod(M.orig_sizes), prod(M.orig_sizes))
 Base.size(M::SymBTTB, j) = size(M)[j]
 LinearAlgebra.issymmetric(M::SymBTTB) = true
 LinearAlgebra.ishermitian(M::SymBTTB) = true
@@ -55,7 +55,9 @@ function SymBTTB(first_columns::Vector{Vector{Float64}}, pre=I)
   SymBTTB(bccb, buf1, buf2, orig_sizes, pre)
 end
 
-function LinearAlgebra.mul!(buf::Vector{Float64}, M::SymBTTB, v::Vector{Float64})
+function LinearAlgebra.mul!(buf::AbstractVector{Float64}, M::SymBTTB, v::AbstractVector{Float64})
+  length(buf) == length(v) || error("Input and output dimensions don't agree.")
+  size(M,1)   == length(v) || error("Input and matrix dimensions don't agree.")
   fill!(M.buf1, 0.0)
   v_grid = reshape(v, M.orig_sizes)
   buf1_grid = reshape(M.buf1, M.bccb.sizes)

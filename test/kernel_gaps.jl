@@ -13,8 +13,10 @@ kernel(dt) = exp(-0.5 * abs(dt))
 M_fast  = [kernel(abs(x-y)) for x in pts, y in pts]
 M_exact = lattice_kernel_matrix(pts, kernel)
 
-v = collect(1.0:length(pts))
-@test M_exact*v ≈ M_fast*v
+v  = collect(1.0:length(pts))
+v2 = hcat(v, v, v)
+@test M_exact*v  ≈ M_fast*v
+@test M_exact*v2 ≈ M_fast*v2
 
 
 #
@@ -33,6 +35,8 @@ kernel(h::SVector{2,Float64}) = exp(-norm(h))
 M_exact = [kernel(x-y) for x in pts, y in pts]
 M_fast  = lattice_kernel_matrix(pts, kernel)
 
-v = collect(1.0:length(pts))
-@test M_exact*v ≈ M_fast*v
+v  = collect(1.0:length(pts))
+v2 = hcat(v, v, v)
+@test M_exact*v  ≈ M_fast*v
+@test M_exact*v2 ≈ M_fast*v2
 

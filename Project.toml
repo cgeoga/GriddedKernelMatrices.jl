@@ -10,18 +10,19 @@ StaticArraysCore = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
 
 [weakdeps]
 Krylov = "ba0b0d4f-ebba-5204-a429-3ac8c609bfb7"
+LowRankApprox = "898213cb-b102-5a47-900c-97e73b919f73"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Vecchia = "8d73829f-f4b0-474a-9580-cecc8e084068"
 
-[compat]
-FFTW = "1.10.0"
-LinearAlgebra = "1.12.0"
-StaticArraysCore = "1.4.4"
-
 [extensions]
-LatticeMatricesKrylovExt  = ["Krylov"]
+LatticeMatricesKrylovExt = ["Krylov"]
 LatticeMatricesVecchiaExt = ["Vecchia"]
 
+[compat]
+FFTW = "1"
+LinearAlgebra = "1"
+StaticArraysCore = "1"
+
 [targets]
-test = ["Test", "StaticArrays", "Krylov", "Vecchia"]
+test = ["Test", "StaticArrays", "Krylov", "Vecchia", "LowRankApprox"]

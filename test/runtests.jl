@@ -1,5 +1,5 @@
 
-using Test, LatticeMatrices, StaticArrays
+using Test, LatticeMatrices, StaticArrays, LowRankApprox
 using LatticeMatrices.LinearAlgebra
 
 @testset "mul" begin
@@ -13,5 +13,9 @@ end
 
 @testset "solve" begin
   include("solve.jl")
+end
+
+@testset "ecosystem" begin
+  include("sketch.jl")
 end
 

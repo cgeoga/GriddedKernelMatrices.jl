@@ -13,16 +13,18 @@ Base.size(M::MaskedSymToeplitz, d::Int) = length(M.ixs)
 LinearAlgebra.issymmetric(M::MaskedSymToeplitz) = true
 LinearAlgebra.ishermitian(M::MaskedSymToeplitz) = true
 
-function LinearAlgebra.mul!(y::Vector{Float64}, M::MaskedSymToeplitz, x::Vector{Float64})
+function LinearAlgebra.mul!(buf::AbstractVector{Float64}, M::MaskedSymToeplitz, v::AbstractVector{Float64})
+  length(buf) == length(v) || error("Input and output dimensions don't agree.")
+  size(M,1)   == length(v) || error("Input and matrix dimensions don't agree.")
   fill!(M.buf1, 0.0)
   @inbounds for (i, idx) in enumerate(M.ixs)
-      M.buf1[idx] = x[i]
+      M.buf1[idx] = v[i]
   end
   mul!(M.buf2, M.toep, M.buf1)
   @inbounds for (i, idx) in enumerate(M.ixs)
-      y[i] = M.buf2[idx]
+      buf[i] = M.buf2[idx]
   end
-  y
+  buf
 end
 
 struct CrossMaskedSymToeplitz{F}
@@ -37,16 +39,40 @@ Base.eltype(M::CrossMaskedSymToeplitz) = Float64
 Base.size(M::CrossMaskedSymToeplitz) = (length(M.ixs_out), length(M.ixs_in))
 Base.size(M::CrossMaskedSymToeplitz, d::Int) = d == 1 ? length(M.ixs_out) : length(M.ixs_in)
 
-function LinearAlgebra.mul!(y::Vector{Float64}, M::CrossMaskedSymToeplitz, x::Vector{Float64})
+function LinearAlgebra.mul!(buf::AbstractVector{Float64}, M::CrossMaskedSymToeplitz, x::AbstractVector{Float64})
   fill!(M.buf1, 0.0)
   @inbounds for (i, idx) in enumerate(M.ixs_in)
     M.buf1[idx] = x[i]
   end
   mul!(M.buf2, M.toep, M.buf1)
   @inbounds for (i, idx) in enumerate(M.ixs_out)
-    y[i] = M.buf2[idx]
+    buf[i] = M.buf2[idx]
   end
-  y
+  buf
+end
+
+struct AdjointCrossMaskedSymToeplitz{F}
+  parent::CrossMaskedSymToeplitz{F}
+end
+
+Base.eltype(M::AdjointCrossMaskedSymToeplitz) = Float64
+Base.size(M::AdjointCrossMaskedSymToeplitz) = (length(M.parent.ixs_in), length(M.parent.ixs_out))
+Base.size(M::AdjointCrossMaskedSymToeplitz, d::Int) = d == 1 ? length(M.parent.ixs_in) : length(M.parent.ixs_out)
+
+Base.adjoint(M::CrossMaskedSymToeplitz) = AdjointCrossMaskedSymToeplitz(M)
+Base.adjoint(M::AdjointCrossMaskedSymToeplitz) = M.parent
+
+function LinearAlgebra.mul!(buf::AbstractVector{Float64}, M::AdjointCrossMaskedSymToeplitz, 
+                            v::AbstractVector{Float64})
+  fill!(M.parent.buf1, 0.0)
+  @inbounds for (i, idx) in enumerate(M.parent.ixs_out)
+    M.parent.buf1[idx] = v[i]
+  end
+  mul!(M.parent.buf2, M.parent.toep, M.parent.buf1)
+  @inbounds for (i, idx) in enumerate(M.parent.ixs_in)
+    buf[i] = M.parent.buf2[idx]
+  end
+  buf
 end
 
 struct MaskedSymBTTB{B,P}
@@ -72,7 +98,9 @@ function MaskedSymBTTB(full_first_columns::Vector{Vector{Float64}},
   MaskedSymBTTB(bttb, given_ixs, full_in, full_out, pre)
 end
 
-function LinearAlgebra.mul!(buf::Vector{Float64}, M::MaskedSymBTTB, v::Vector{Float64})
+function LinearAlgebra.mul!(buf::AbstractVector{Float64}, M::MaskedSymBTTB, v::AbstractVector{Float64})
+  length(buf) == length(v) || error("Input and output dimensions don't agree.")
+  size(M,1)   == length(v) || error("Input and matrix dimensions don't agree.")
   fill!(M.full_in, 0.0)
   for i in eachindex(v)
     @inbounds M.full_in[M.given_ixs[i]] = v[i]
@@ -103,15 +131,40 @@ Base.size(M::CrossMaskedSymBTTB, j) = j == 1 ? length(M.ixs_out) : length(M.ixs_
 LinearAlgebra.issymmetric(M::CrossMaskedSymBTTB) = false
 LinearAlgebra.ishermitian(M::CrossMaskedSymBTTB) = false
 
-function LinearAlgebra.mul!(y::Vector{Float64}, M::CrossMaskedSymBTTB, x::Vector{Float64})
+function LinearAlgebra.mul!(buf::AbstractVector{Float64}, M::CrossMaskedSymBTTB, v::AbstractVector{Float64})
   fill!(M.buf1, 0.0)
   @inbounds for (i, idx) in enumerate(M.ixs_in)
-    M.buf1[idx] = x[i]
+    M.buf1[idx] = v[i]
   end
   mul!(M.buf2, M.bttb, M.buf1)
   @inbounds for (i, idx) in enumerate(M.ixs_out)
-    y[i] = M.buf2[idx]
+    buf[i] = M.buf2[idx]
   end
-  y
+  buf
+end
+
+struct AdjointCrossMaskedSymBTTB{B,P}
+  parent::CrossMaskedSymBTTB{B,P}
+end
+
+Base.eltype(M::AdjointCrossMaskedSymBTTB) = Float64
+Base.size(M::AdjointCrossMaskedSymBTTB) = (length(M.parent.ixs_in), length(M.parent.ixs_out))
+Base.size(M::AdjointCrossMaskedSymBTTB, d::Int) = d == 1 ? length(M.parent.ixs_in) : length(M.parent.ixs_out)
+
+# Wire up the standard adjoint syntax
+Base.adjoint(M::CrossMaskedSymBTTB) = AdjointCrossMaskedSymBTTB(M)
+Base.adjoint(M::AdjointCrossMaskedSymBTTB) = M.parent
+
+function LinearAlgebra.mul!(buf::AbstractVector{Float64}, M::AdjointCrossMaskedSymBTTB, 
+                            v::AbstractVector{Float64})
+  fill!(M.parent.buf1, 0.0)
+  @inbounds for (i, idx) in enumerate(M.parent.ixs_out)
+    M.parent.buf1[idx] = v[i]
+  end
+  mul!(M.parent.buf2, M.parent.bttb, M.parent.buf1)
+  @inbounds for (i, idx) in enumerate(M.parent.ixs_in)
+    buf[i] = M.parent.buf2[idx]
+  end
+  buf
 end
 

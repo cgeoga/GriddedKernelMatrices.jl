@@ -2,7 +2,7 @@
 
 julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "e1ffc4675863baf6e06105dda3cc27e46094a3ba"
+project_hash = "dd31f4d2af7bfa3d9739eba15734fa2e057f0f91"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -86,9 +86,11 @@ version = "0.1.0"
 
     [deps.LatticeMatrices.extensions]
     LatticeMatricesKrylovExt = ["Krylov"]
+    LatticeMatricesVecchiaExt = ["Vecchia"]
 
     [deps.LatticeMatrices.weakdeps]
     Krylov = "ba0b0d4f-ebba-5204-a429-3ac8c609bfb7"
+    LowRankApprox = "898213cb-b102-5a47-900c-97e73b919f73"
     StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
     Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
     Vecchia = "8d73829f-f4b0-474a-9580-cecc8e084068"
