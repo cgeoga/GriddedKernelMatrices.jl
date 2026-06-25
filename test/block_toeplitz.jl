@@ -3,7 +3,7 @@ v1 = [1.0, 2.0, 3.0]
 v2 = [4.0, 5.0, 6.0]
 v3 = [7.0, 8.0, 9.0]
 
-op = LatticeMatrices.SymBTTB([v1, v2, v3])
+op = GriddedKernelMatrices.SymBTTB([v1, v2, v3])
 
 M1 = [1.0 2.0 3.0
       2.0 1.0 2.0

@@ -2,7 +2,7 @@
 
 julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "dd31f4d2af7bfa3d9739eba15734fa2e057f0f91"
+project_hash = "0660bf74a9a6b6ec96c5b9e9bc07ccdaafab967a"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -61,6 +61,23 @@ version = "3.3.12+0"
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 version = "1.11.0"
 
+[[deps.GriddedKernelMatrices]]
+deps = ["FFTW", "LinearAlgebra", "StaticArraysCore"]
+path = "."
+uuid = "cf2c15de-87d3-40f9-b8fb-d9ceedc29f88"
+version = "0.1.0"
+
+    [deps.GriddedKernelMatrices.extensions]
+    GriddedKernelMatricesKrylovExt = ["Krylov"]
+    GriddedKernelMatricesVecchiaExt = ["Vecchia"]
+
+    [deps.GriddedKernelMatrices.weakdeps]
+    Krylov = "ba0b0d4f-ebba-5204-a429-3ac8c609bfb7"
+    LowRankApprox = "898213cb-b102-5a47-900c-97e73b919f73"
+    StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+    Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+    Vecchia = "8d73829f-f4b0-474a-9580-cecc8e084068"
+
 [[deps.IntelOpenMP_jll]]
 deps = ["Artifacts", "JLLWrappers", "LazyArtifacts", "Libdl"]
 git-tree-sha1 = "ec1debd61c300961f98064cfb21287613ad7f303"
@@ -77,23 +94,6 @@ version = "1.8.0"
 deps = ["StyledStrings"]
 uuid = "ac6e5ff7-fb65-4e79-a425-ec3bc9c03011"
 version = "1.12.0"
-
-[[deps.LatticeMatrices]]
-deps = ["FFTW", "LinearAlgebra", "StaticArraysCore"]
-path = "."
-uuid = "121862f6-dfd6-45b4-8685-9e43f11b1d48"
-version = "0.1.0"
-
-    [deps.LatticeMatrices.extensions]
-    LatticeMatricesKrylovExt = ["Krylov"]
-    LatticeMatricesVecchiaExt = ["Vecchia"]
-
-    [deps.LatticeMatrices.weakdeps]
-    Krylov = "ba0b0d4f-ebba-5204-a429-3ac8c609bfb7"
-    LowRankApprox = "898213cb-b102-5a47-900c-97e73b919f73"
-    StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
-    Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-    Vecchia = "8d73829f-f4b0-474a-9580-cecc8e084068"
 
 [[deps.LazyArtifacts]]
 deps = ["Artifacts", "Pkg"]

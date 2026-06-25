@@ -4,7 +4,7 @@ v2 = [4.0, 5.0, 6.0]
 v3 = [7.0, 8.0, 9.0]
 
 given_ixs = [1,2,4,5,7,9]
-op = LatticeMatrices.MaskedSymBTTB([v1, v2, v3], given_ixs)
+op = GriddedKernelMatrices.MaskedSymBTTB([v1, v2, v3], given_ixs)
 
 M1 = [1.0 2.0 3.0
       2.0 1.0 2.0

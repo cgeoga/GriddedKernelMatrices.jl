@@ -1,5 +1,5 @@
 
-# LatticeMatrices.jl
+# GriddedKernelMatrices.jl
 
 This package offers very simple functionality for accelerating kernel matrices
 for which (1) the kernel is shift-invariant, so that it accepts a distance/lag
@@ -15,7 +15,7 @@ offers very performant preconditioners if you load the optional
 [Krylov.jl](https://github.com/JuliaSmoothOptimizers/Krylov.jl) extension. Here is a quick
 demonstration:
 ```julia
-using StaticArrays, LatticeMatrices
+using StaticArrays, GriddedKernelMatrices
 using  Krylov, Vecchia # optional extensions if you want fast \ as well as *.
 
 # Example points on a lattice. Your input pts here may also be on a lattice but

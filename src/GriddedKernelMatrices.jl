@@ -1,4 +1,4 @@
-module LatticeMatrices
+module GriddedKernelMatrices
 
   using LinearAlgebra, FFTW, StaticArraysCore
 

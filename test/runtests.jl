@@ -1,6 +1,6 @@
 
-using Test, LatticeMatrices, StaticArrays, LowRankApprox
-using LatticeMatrices.LinearAlgebra
+using Test, GriddedKernelMatrices, StaticArrays, LowRankApprox
+using GriddedKernelMatrices.LinearAlgebra
 
 @testset "mul" begin
   include("toeplitz.jl")

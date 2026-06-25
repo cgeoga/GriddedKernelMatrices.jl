@@ -1,5 +1,5 @@
-name = "LatticeMatrices"
-uuid = "121862f6-dfd6-45b4-8685-9e43f11b1d48"
+name = "GriddedKernelMatrices"
+uuid = "cf2c15de-87d3-40f9-b8fb-d9ceedc29f88"
 version = "0.1.0"
 authors = ["Chris Geoga <geoga@wisc.edu>"]
 
@@ -16,8 +16,8 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Vecchia = "8d73829f-f4b0-474a-9580-cecc8e084068"
 
 [extensions]
-LatticeMatricesKrylovExt = ["Krylov"]
-LatticeMatricesVecchiaExt = ["Vecchia"]
+GriddedKernelMatricesKrylovExt = ["Krylov"]
+GriddedKernelMatricesVecchiaExt = ["Vecchia"]
 
 [compat]
 FFTW = "1"
