@@ -88,6 +88,6 @@ function lattice_kernel_matrix(pts1::Vector{SVector{2,Float64}},
   bttb = SymBTTB(full_columns)
   buf1 = zeros(Float64, ny*nx)
   buf2 = zeros(Float64, ny*nx)
-  CrossMaskedBTTB(bttb, ixs_out, ixs_in, buf1, buf2)
+  CrossMaskedSymBTTB(bttb, ixs_out, ixs_in, buf1, buf2)
 end
 

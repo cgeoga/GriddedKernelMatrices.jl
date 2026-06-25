@@ -11,5 +11,7 @@ module LatticeMatrices
   include("kernel.jl")
   export lattice_kernel_matrix, VecchiaPreconditioner
 
+  include("common.jl")
+
 end 
 

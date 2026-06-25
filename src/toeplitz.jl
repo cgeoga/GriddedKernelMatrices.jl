@@ -38,18 +38,3 @@ function LinearAlgebra.mul!(buf::Vector{Float64}, M::SymToeplitz{F,P},
   buf
 end
 
-Base.:*(M::SymToeplitz, x) = mul!(copy(x), M, x)
-
-function _solve! end
-
-function LinearAlgebra.ldiv!(buf::Vector{Float64}, M::SymToeplitz, 
-                             x::Vector{Float64})
-  if hasmethod(_solve!, (Vector{Float64}, SymToeplitz, Vector{Float64}))
-    _solve!(buf, M, x)
-    return buf
-  end
-  error("Please load the `Krylov.jl` extension for ldiv!")
-end
-
-Base.:\(M::SymToeplitz, x) = ldiv!(copy(x), M, x)
-

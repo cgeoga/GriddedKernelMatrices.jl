@@ -75,19 +75,3 @@ function LinearAlgebra.mul!(buf::Vector{Float64}, M::SymBTTB, v::Vector{Float64}
   buf
 end
 
-function Base.:*(M::SymBTTB, v::Vector{Float64})
-  buf = similar(v)
-  mul!(buf, M, v)
-end
-
-function LinearAlgebra.ldiv!(buf::Vector{Float64}, M::SymBTTB, 
-                             x::Vector{Float64})
-  if hasmethod(_solve!, (Vector{Float64}, SymBTTB, Vector{Float64}))
-    _solve!(buf, M, x)
-    return buf
-  end
-  error("Please load the `Krylov.jl` extension for ldiv!")
-end
-
-Base.:\(M::SymBTTB, x) = ldiv!(copy(x), M, x)
-

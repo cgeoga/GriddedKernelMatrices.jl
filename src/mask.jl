@@ -25,19 +25,6 @@ function LinearAlgebra.mul!(y::Vector{Float64}, M::MaskedSymToeplitz, x::Vector{
   y
 end
 
-Base.:*(M::MaskedSymToeplitz, x::Vector{Float64}) = mul!(similar(x), M, x)
-
-function LinearAlgebra.ldiv!(buf::Vector{Float64}, M::MaskedSymToeplitz, 
-                             x::Vector{Float64})
-  if hasmethod(_solve!, (Vector{Float64}, MaskedSymToeplitz, Vector{Float64}))
-    _solve!(buf, M, x)
-    return buf
-  end
-  error("Please load the `Krylov.jl` extension for ldiv!")
-end
-
-Base.:\(M::MaskedSymToeplitz, x) = ldiv!(copy(x), M, x)
-
 struct CrossMaskedSymToeplitz{F}
   toep::SymToeplitz{F}
   ixs_out::Vector{Int}
@@ -61,9 +48,6 @@ function LinearAlgebra.mul!(y::Vector{Float64}, M::CrossMaskedSymToeplitz, x::Ve
   end
   y
 end
-
-Base.:*(M::CrossMaskedSymToeplitz, x::Vector{Float64}) = mul!(zeros(Float64, size(M, 1)), M, x)
-
 
 struct MaskedSymBTTB{B,P}
   bttb::B
@@ -105,18 +89,7 @@ function Base.:*(M::MaskedSymBTTB, v::Vector{Float64})
   mul!(buf, M, v)
 end
 
-function LinearAlgebra.ldiv!(buf::Vector{Float64}, M::MaskedSymBTTB, 
-                             x::Vector{Float64})
-  if hasmethod(_solve!, (Vector{Float64}, MaskedSymBTTB, Vector{Float64}))
-    _solve!(buf, M, x)
-    return buf
-  end
-  error("Please load the `Krylov.jl` extension for ldiv!")
-end
-
-Base.:\(M::MaskedSymBTTB, x) = ldiv!(copy(x), M, x)
-
-struct CrossMaskedBTTB{B,P}
+struct CrossMaskedSymBTTB{B,P}
   bttb::SymBTTB{B,P}
   ixs_out::Vector{Int}
   ixs_in::Vector{Int}
@@ -124,13 +97,13 @@ struct CrossMaskedBTTB{B,P}
   buf2::Vector{Float64}
 end
 
-Base.eltype(M::CrossMaskedBTTB)  = Float64
-Base.size(M::CrossMaskedBTTB)    = (length(M.ixs_out), length(M.ixs_in))
-Base.size(M::CrossMaskedBTTB, j) = j == 1 ? length(M.ixs_out) : length(M.ixs_in)
-LinearAlgebra.issymmetric(M::CrossMaskedBTTB) = false
-LinearAlgebra.ishermitian(M::CrossMaskedBTTB) = false
+Base.eltype(M::CrossMaskedSymBTTB)  = Float64
+Base.size(M::CrossMaskedSymBTTB)    = (length(M.ixs_out), length(M.ixs_in))
+Base.size(M::CrossMaskedSymBTTB, j) = j == 1 ? length(M.ixs_out) : length(M.ixs_in)
+LinearAlgebra.issymmetric(M::CrossMaskedSymBTTB) = false
+LinearAlgebra.ishermitian(M::CrossMaskedSymBTTB) = false
 
-function LinearAlgebra.mul!(y::Vector{Float64}, M::CrossMaskedBTTB, x::Vector{Float64})
+function LinearAlgebra.mul!(y::Vector{Float64}, M::CrossMaskedSymBTTB, x::Vector{Float64})
   fill!(M.buf1, 0.0)
   @inbounds for (i, idx) in enumerate(M.ixs_in)
     M.buf1[idx] = x[i]
@@ -141,6 +114,4 @@ function LinearAlgebra.mul!(y::Vector{Float64}, M::CrossMaskedBTTB, x::Vector{Fl
   end
   y
 end
-
-Base.:*(M::CrossMaskedBTTB, x::Vector{Float64}) = mul!(zeros(Float64, size(M, 1)), M, x)
 
