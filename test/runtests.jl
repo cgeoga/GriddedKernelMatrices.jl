@@ -4,11 +4,10 @@ using GriddedKernelMatrices.LinearAlgebra
 
 @testset "mul" begin
   include("toeplitz.jl")
-  include("block_toeplitz.jl")
-  include("masked_mul.jl")
   include("different_grids.jl")
   include("kernel_gaps.jl")
   include("cross_mul.jl")
+  include("aniso.jl")
 end
 
 @testset "solve" begin

@@ -73,9 +73,11 @@ end
 function lattice_kernel_matrix(pts::Vector{SVector{2,Float64}}, kernel,
                                preconditioner=NoPreconditioner())
   (;lag1r, lag2r, observed_ixs) = identify_lattice(pts)
-  full_columns = [[kernel(SVector(l1, l2)) for l2 in lag2r] for l1 in lag1r]
-  pre = gen_preconditioner(preconditioner, pts, kernel)
-  MaskedSymBTTB(full_columns, observed_ixs, pre)
+  bttb = SymBTTB(kernel, step(lag1r), step(lag2r), length(lag1r), length(lag2r))
+  buf1 = zeros(Float64, length(lag1r)*length(lag2r))
+  buf2 = zeros(Float64, length(lag1r)*length(lag2r))
+  pre  = gen_preconditioner(preconditioner, pts, kernel)
+  MaskedSymBTTB(bttb, observed_ixs, buf1, buf2, pre)
 end
 
 function identify_lattice(pts1::Vector{SVector{2,Float64}}, 
@@ -109,10 +111,7 @@ function lattice_kernel_matrix(pts1::Vector{SVector{2,Float64}},
                                pts2::Vector{SVector{2,Float64}}, 
                                kernel)
   (;lag1r, lag2r, ixs_in, ixs_out) = identify_lattice(pts1, pts2)
-  full_columns = map(lag1r) do l1
-    [kernel(SVector(l1, l2)) for l2 in lag2r]
-  end
-  bttb = SymBTTB(full_columns)
+  bttb = SymBTTB(kernel, step(lag1r), step(lag2r), length(lag1r), length(lag2r))
   buf1 = zeros(Float64, length(lag1r)*length(lag2r))
   buf2 = zeros(Float64, length(lag1r)*length(lag2r))
   CrossMaskedSymBTTB(bttb, ixs_out, ixs_in, buf1, buf2)

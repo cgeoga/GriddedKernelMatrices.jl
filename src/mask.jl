@@ -89,10 +89,10 @@ Base.size(M::MaskedSymBTTB, j) = size(M)[j]
 LinearAlgebra.issymmetric(M::MaskedSymBTTB) = true
 LinearAlgebra.ishermitian(M::MaskedSymBTTB) = true
 
-function MaskedSymBTTB(full_first_columns::Vector{Vector{Float64}}, 
-                       given_ixs::Vector{Int64}, pre=I)
-  bttb = SymBTTB(full_first_columns)
-  N_total = length(full_first_columns[1]) * length(full_first_columns)
+function MaskedSymBTTB(kernel, dx::Float64, dy::Float64, nx::Int, ny::Int,
+                       given_ixs::Vector{Int}, pre=I)
+  bttb = SymBTTB(kernel, dx, dy, nx, ny)
+  N_total = nx * ny
   full_in = Vector{Float64}(undef, N_total)
   full_out = Vector{Float64}(undef, N_total)
   MaskedSymBTTB(bttb, given_ixs, full_in, full_out, pre)

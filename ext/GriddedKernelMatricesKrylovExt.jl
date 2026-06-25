@@ -24,7 +24,7 @@ module GriddedKernelMatricesKrylovExt
       for j in 1:size(v, 2)
         bufj  = view(buf, :, j)
         vj    = view(v,   :, j)
-        cg!(work, M, v; M=M.pre)
+        cg!(work, M, v; M=M.pre, verbose=5)
         bufj .= work.x
       end
       buf

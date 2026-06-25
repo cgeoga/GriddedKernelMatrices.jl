@@ -43,16 +43,20 @@ Base.size(M::SymBTTB, j) = size(M)[j]
 LinearAlgebra.issymmetric(M::SymBTTB) = true
 LinearAlgebra.ishermitian(M::SymBTTB) = true
 
-function SymBTTB(first_columns::Vector{Vector{Float64}}, pre=I)
-  circ_inner = circulant_extend.(first_columns)
-  circ_outer = circulant_extend(circ_inner)
-  sizes  = (length(circ_outer[1]), length(circ_outer))
-  c_flat = reduce(vcat, circ_outer)
-  bccb = BCCB(c_flat, sizes)
-  buf1 = Vector{Float64}(undef, length(c_flat))
-  buf2 = Vector{Float64}(undef, length(c_flat))
-  orig_sizes = (length(first_columns[1]), length(first_columns))
-  SymBTTB(bccb, buf1, buf2, orig_sizes, pre)
+function SymBTTB(kernel, dx::Float64, dy::Float64, nx::Int, ny::Int, pre=I)
+  (My, Mx) = (2*ny-1, 2*nx-1)
+  c_ext = zeros(Float64, My, Mx)
+  for ix in -(nx-1):(nx-1)
+    for iy in -(ny-1):(ny-1)
+      idx_x = ix >= 0 ? ix + 1 : Mx + ix + 1
+      idx_y = iy >= 0 ? iy + 1 : My + iy + 1
+      c_ext[idx_y, idx_x] = kernel(SVector(ix * dx, iy * dy))
+    end
+  end
+  bccb = BCCB(vec(c_ext), (My, Mx))
+  buf1 = Vector{Float64}(undef, length(c_ext))
+  buf2 = Vector{Float64}(undef, length(c_ext))
+  SymBTTB(bccb, buf1, buf2, (ny, nx), pre)
 end
 
 function LinearAlgebra.mul!(buf::AbstractVector{Float64}, M::SymBTTB, v::AbstractVector{Float64})
