@@ -22,5 +22,9 @@ for dim in (1,2) # hits Toeplitz and block Toeplitz.
   local v = Float64.(eachindex(pts))
   @test isapprox(M_fast\v, M_ref\v, rtol=1e-7)
 
+  # Matrix solve:
+  local vm = [log1p(i+j) for i in 1:length(pts), j in 1:10]
+  @test isapprox(M_fast\vm, M_ref\vm, rtol=1e-7)
+
 end
 

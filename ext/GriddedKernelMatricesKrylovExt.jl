@@ -20,14 +20,10 @@ module GriddedKernelMatricesKrylovExt
     end
 
     function GriddedKernelMatrices._solve!(buf::AbstractMatrix, M::$T, v::AbstractMatrix)
-      work = CgWorkspace(M, view(v, :, 1))
-      for j in 1:size(v, 2)
-        bufj  = view(buf, :, j)
-        vj    = view(v,   :, j)
-        cg!(work, M, vj; M=M.pre)
-        bufj .= work.x
-      end
-      buf
+      @info "For block solves, (P)GMRES is used instead of (P)CG. Please manually loop over individual solves if you specifically need CG." maxlog=1
+      work = BlockGmresWorkspace(M, v; memory=30)
+      block_gmres!(work, M, v; M=M.pre)
+      buf .= work.X
     end
 
     end

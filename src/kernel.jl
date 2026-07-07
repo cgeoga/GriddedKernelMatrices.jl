@@ -80,6 +80,7 @@ function lattice_kernel_matrix(pts::Vector{SVector{2,Float64}}, kernel,
   MaskedSymBTTB(bttb, observed_ixs, buf1, buf2, pre)
 end
 
+#=
 function identify_lattice(pts1::Vector{SVector{2,Float64}}, 
                           pts2::Vector{SVector{2,Float64}})
   all_pts = vcat(pts1, pts2)
@@ -87,6 +88,40 @@ function identify_lattice(pts1::Vector{SVector{2,Float64}},
   ex2 = extrema(x->x[2], all_pts)
   dx1 = minimum(diff(sort(unique(getindex.(all_pts, 1)))))
   dx2 = minimum(diff(sort(unique(getindex.(all_pts, 2)))))
+  nx  = round(Int, (ex1[2] - ex1[1])/dx1) + 1
+  ny  = round(Int, (ex2[2] - ex2[1])/dx2) + 1
+  if (nx * ny) > 10 * length(all_pts)
+    @warn "Embedding these points in a grid requires an internal FFT of size $(2*nx-1) x $(2*ny-1). If this is larger than expected, please double check your provided locations."
+  end
+  lag1r = range(0.0, step=dx1, length=nx)
+  lag2r = range(0.0, step=dx2, length=ny)
+  ixs_out = map(pts1) do pt
+    i = round(Int, (pt[2] - ex2[1])/dx2) + 1
+    j = round(Int, (pt[1] - ex1[1])/dx1) + 1
+    i + (j-1)*ny
+  end
+  ixs_in = map(pts2) do pt
+    i = round(Int, (pt[2] - ex2[1])/dx2) + 1
+    j = round(Int, (pt[1] - ex1[1])/dx1) + 1
+    i + (j-1)*ny
+  end
+  (;lag1r, lag2r, ixs_in, ixs_out)
+end
+=#
+
+function identify_lattice(pts1::Vector{SVector{2,Float64}}, 
+                          pts2::Vector{SVector{2,Float64}})
+  all_pts = vcat(pts1, pts2)
+  ex1 = extrema(x->x[1], all_pts)
+  ex2 = extrema(x->x[2], all_pts)
+  # TODO (cg 2026/07/03 13:26): think more about how this should work.
+  function get_dx(coords)
+    diffs = diff(sort(unique(coords)))
+    idx = findfirst(>(1e-10), diffs) 
+    isnothing(idx) ? 1.0 : diffs[idx]
+  end
+  dx1 = get_dx(getindex.(all_pts, 1))
+  dx2 = get_dx(getindex.(all_pts, 2))
   nx  = round(Int, (ex1[2] - ex1[1])/dx1) + 1
   ny  = round(Int, (ex2[2] - ex2[1])/dx2) + 1
   if (nx * ny) > 10 * length(all_pts)
